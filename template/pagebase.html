@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ user.username }}-博客园</title>
+    <link href="https://cdn.bootcss.com/twitter-bootstrap/3.3.7/css/bootstrap.css" rel="stylesheet">
+    <style>
+        hr {
+            margin: 5px 0;
+        }
+
+        .diggit {
+
+            width: 46px;
+            height: 52px;
+            background: url(/media/images/upup.gif) no-repeat;
+            text-align: center;
+            cursor: pointer;
+            margin-top: 2px;
+            padding-top: 5px;
+        }
+
+        .buryit {
+
+            margin-left: 5px;
+            width: 46px;
+            height: 52px;
+            background: url(/media/images/downdown.gif) no-repeat;
+            text-align: center;
+            cursor: pointer;
+            margin-top: 2px;
+            padding-top: 5px;
+        }
+
+        .sub li {
+            background: #f7f8fa;
+
+        }
+
+        .sub {
+            margin-bottom: 5px;
+        }
+
+        #commentform_title {
+            background-image: url(/media/images/icon_addcomment.gif);
+            background-repeat: no-repeat;
+            padding: 0 0 0 25px;
+            margin-bottom: 10px;
+        }
+
+      .author {
+            background-image: url(/media/images/icon_form.gif);
+            background-repeat: no-repeat;
+            border: 1px solid #ccc;
+            padding: 4px 4px 4px 30px;
+            width: 300px;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid ">
+    <div class="row bg-success"><h2><a href="/{{ user.username }}/">{{ user.blog.site_title }}</a></h2></div>
+    <div class="row">
+        <ul class="nav nav-tabs">
+            <li role="presentation" class="active"><a href="http://172.96.198.74">博客园</a></li>
+            <li role="presentation"><a href="#">新随笔</a></li>
+            <li role="presentation"><a href="#">管理</a></li>
+        </ul>
+    </div>
+    <div class="row">
+        <div class="col-md-3">
+            {% load customtag %}
+            {% category_and_tag user %}
+        </div>
+        <div class="col-md-8">
+            {% block content %}
+
+            {% endblock %}
+            {% block foot %}
+            {% endblock %}
+        </div>
+    </div>
+
+
+</div>
+</body>
+{% block ajax %}
+{% endblock %}
+</html>

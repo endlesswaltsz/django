@@ -1,0 +1,42 @@
+{% extends 'pagebase.html' %}
+{% block content %}
+    <div class="row"><h4>分类 -{% if category %}
+        {{ category.name }}{% elif tag %}{{ tag.name }}{% else %}{{ archive.0.upload_time|date:'Y年m月' }}
+    {% endif %}</h4>
+        <hr>
+    </div>
+    {% if category %}
+        {% for foo in category.article_set.all %}
+            <div class="row">
+                <h5><a href="/{{ user.username }}/articles/{{ foo.pk }}">{{ foo.title }}</a></h5>
+                <hr>
+                {{ foo.content|truncatechars:200 }}</div>
+            <div class="row"><h5 class="pull-right">post @ {{ foo.upload_time|date:'Y年m月d日 H:i:s' }}
+                评论({{ foo.comment_count }})
+                点赞({{ foo.like_count }})</h5></div>
+        {% endfor %}
+    {% endif %}
+    {% if tag %}
+        {% for foo in tag.article_set.all %}
+            <div class="row">
+                <h5><a href="/{{ user.username }}/articles/{{ foo.pk }}">{{ foo.title }}</a></h5>
+                <hr>
+                {{ foo.content|truncatechars:200 }}</div>
+            <div class="row"><h5 class="pull-right">post @ {{ foo.upload_time|date:'Y年m月d日 H:i:s' }}
+                评论({{ foo.comment_count }})
+                点赞({{ foo.like_count }})</h5></div>
+        {% endfor %}
+    {% endif %}
+    {% if archive %}
+        {% for foo in archive %}
+            <div class="row">
+                <h5><a href="/{{ user.username }}/articles/{{ foo.pk }}">{{ foo.title }}</a></h5>
+                <hr>
+                {{ foo.content|truncatechars:200 }}</div>
+            <div class="row"><h5 class="pull-right">post @ {{ foo.upload_time|date:'Y年m月d日 H:i:s' }}
+                评论({{ foo.comment_count }})
+                点赞({{ foo.like_count }})</h5></div>
+        {% endfor %}
+    {% endif %}
+{% endblock %}
+

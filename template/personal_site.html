@@ -1,0 +1,12 @@
+{% extends 'pagebase.html' %}
+{% block content %}
+    {% for foo in article %}
+        <div class="row">
+            <h5><a href="articles/{{ foo.pk }}">{{ foo.title }}</a></h5>
+            <hr>
+            {{ foo.content|truncatechars:200 }}</div>
+        <div class="row"><h5 class="pull-right">post @ {{ foo.upload_time|date:'Y年m月d日 H:i:s' }}
+            评论({{ foo.comment_count }})
+            点赞({{ foo.like_count }})</h5></div>
+    {% endfor %}
+{% endblock %}

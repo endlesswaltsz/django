@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>login</title>
+    <link href="https://cdn.bootcss.com/twitter-bootstrap/3.3.7/css/bootstrap.css" rel="stylesheet">
+    <style>
+        img {
+            width: 100px;
+            height: 100px;
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+
+    <div class="row col-md-4 col-md-offset-4" style="margin-top: 100px">
+        <h2>注册</h2>
+        <hr>
+        <form class="form-horizontal" novalidate>
+            {% csrf_token %}
+            {% for foo in form %}
+                <div class="form-group">
+                    <label for="{{ foo.auto_id }}" class="col-sm-2 control-label">{{ foo.label }}</label>
+                    <div class="col-sm-10">
+                        {{ foo }}
+                        <span class="pull-right" style="color: red">{{ foo.errors.0 }}</span>
+                    </div>
+                </div>
+            {% endfor %}
+            <div class="form-horizontal">
+                <label for="head" style="margin-left: 45px"><span style="margin-right: 40px">头像</span><img
+                        src="/media/avatar/simple_avatar.png" alt=""></label>
+
+                <input type="file" id="head" style="display: none">
+
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <button type="button" class="btn btn-default" id="submit">注册</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+<script src="/static/jQuery/jquery.js"></script>
+<script src="/static/bootstrap-3.3.7/js/bootstrap.js"></script>
+<script>
+    $('#head').on('change', function () {
+        let file = $('#head')[0].files[0];
+        let file_reader = new FileReader();
+        file_reader.readAsDataURL(file);
+        file_reader.onload = function () {
+            $('img').attr('src', file_reader.result, 'style', 'width: 100px;height: 100px')
+        }
+    });
+    $('#submit').on('click', function () {
+        $('.pull-right').text('');
+        let formdata = new FormData();
+        let file = $('#head')[0].files[0];
+        $.each($('form').serializeArray(), function (k, v) {
+            formdata.append(v.name, v.value);
+        });
+        formdata.append('head', file);
+        $.ajax({
+            url: '/register/',
+            method: 'post',
+            data: formdata,
+            processData: false,
+            contentType: false,
+            success: function (data) {
+                if (data.status == 'success') {
+                    window.location.href = data.url
+                } else {
+                    $.each(data.msg, function (k, v) {
+                        $('#id_' + k).next().text(v[0])
+                    });
+                    if (data.msg.__all__) {
+                        $('#id_re_password').next().text(data.msg.__all__[0])
+                    }
+                }
+            }
+        })
+    })
+</script>
+</html>

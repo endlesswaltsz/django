@@ -1,0 +1,34 @@
+{% if category %}
+    <div class="panel panel-default">
+        <div class="panel-heading">随笔分类</div>
+        {% for foo in category %}
+            <div class="panel-body"><a href="/{{ user.username }}/category/{{ foo.2 }}">{{ foo.0 }}</a>({{ foo.1 }})
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+{% if tag %}
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            标签分类
+        </div>
+        {% for foo in tag %}
+            <div class="panel-body"><a href="/{{ user.username }}/tag/{{ foo.2 }}">{{ foo.0 }}</a>({{ foo.1 }})</div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+{% if time_article %}
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            档案分类
+        </div>
+        {% for foo in time_article %}
+            <div class="panel-body"><a
+                    href="/{{ user.username }}/archive/{{ foo.2|date:'Ym' }}">{{ foo.0|date:'Y年m月' }}</a>({{ foo.1 }})
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+

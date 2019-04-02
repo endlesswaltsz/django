@@ -1,0 +1,301 @@
+{% extends 'pagebase.html' %}
+{% block content %}
+    <h4><strong>{{ article.0.title }}</strong></h4>
+    <hr>
+    {{ article.0.content|safe }}
+{% endblock %}
+{% block foot %}
+    <div class="container-fluid">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-1 col-md-offset-10">
+                <div class="diggit vote">
+                    <span class="diggnum" id="like">{{ like.count }}</span>
+                </div>
+            </div>
+            <div class="col-md-1">
+                <div class="buryit vote">
+                    <span class="burynum" id="against">{{ against.count }}</span>
+                </div>
+            </div>
+            <p style="display: none">{{ request.user.is_authenticated }}</p>
+        </div>
+        <div class="row">
+            <span class="col-md-2 col-md-offset-10" id="msg" style="color: red"></span>
+        </div>
+    </div>
+    <div class="container-fluid">
+
+        {% if pages %}
+            <h3>评论列表</h3>
+        {% endif %}
+        <ul class="list-group">
+            {% for each in pages %}
+                <li class="list-group-item">
+                    {% csrf_token %}
+                    {% for root,subs in each.items %}
+                        <div class="container-fluid" floor="{{ root.floor }}">#{{ root.floor }}楼
+                            {% if root.user.username == article.0.blog.userinfo.username %}[楼主]{% endif %}
+                        </div>
+                        <div class="container-fluid">{{ root.content }}
+                            <br>
+                            <p class="pull-right"><a
+                                    href="http://127.0.0.1:8000/{{ root.user.username }}"> {{ root.user.username }}</a>
+                                评论于 {{ root.create_time|date:'Y-m-d H:i:s' }}
+                                {% if request.user.is_authenticated %}<span style="color: #2aabd2;cursor: pointer"
+                                                                            class="reply">回复</span>{% endif %}
+                            </p>
+                        </div>
+                        <div class="container-fluid " style="display: none">
+                            <div class="col-md-12">
+                                <input type="text" class="form-control content" style="margin-bottom:5px">
+                            </div>
+                            <div class="pull-right">
+                                <input type="button" class="btn btn-default btn_f" value="提交" style="margin-bottom:5px">
+                            </div>
+                        </div>
+                        <div class="container-fluid">
+                            <ul class="list-group sub">
+                                {% for sub in subs %}
+                                    <li class="list-group-item {% if forloop.counter > 3 %}
+                                    hidden
+                                    {% endif %}"><a
+                                            href="http://127.0.0.1:8000/{{ sub.user.username }}">{{ sub.user.username }}</a>
+                                        {% if sub.reply %}: 回复 {{ sub.reply.username }}
+
+                                        {% endif %}:{{ sub.content }}
+                                        <div class="container-fluid ">
+                                            <p class="pull-right">{{ sub.create_time|date:'Y-m-d H:i:s' }}
+                                                {% if request.user.is_authenticated %}
+                                                    <span style="color: #9d9d9d;cursor: pointer"
+                                                          reply="{{ sub.user.username }}"
+                                                          class="reply_to">回复</span>
+                                                {% endif %}
+                                            </p>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                                {% load customtag %}
+                                {% if subs|length > 3 %}
+                                    <p style="margin-top: 5px">还有{{ subs|length|add:'-3' }}条回复,<span class="show_all"
+                                                                                                     style="color: #2e6da4;cursor: pointer">查看全部</span>
+                                    </p>
+                                {% endif %}
+
+                                {% if sub %}
+                                    <div class="container-fluid comment" style="display: none;margin-top: 5px">
+                                        <div class="col-md-12">
+                                            <input type="text" class="form-control content" style="margin-bottom:5px">
+                                        </div>
+                                        <div class="pull-right">
+                                            <input type="button" class="btn btn-default btn_r" value="提交"
+                                                   style="margin-bottom:5px">
+
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    {% endfor %}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% if pages.number > 1 %}
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                {% if pages.has_previous %}
+                    <li>
+                        <a href="/{{ article.0.blog.site_name }}/articles/{{ article.0.pk }}?page=1"
+                           aria-label="Previous">
+                            <span aria-hidden="true">首页</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/{{ article.0.blog.site_name }}/articles/{{ article.0.pk }}?page={{ pages.previous_page_number }}"
+                           aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+                {% for index in page_range %}
+                    <li {% if pages.number == index %} class="active" {% endif %}><a
+                            href="/{{ article.0.blog.site_name }}/articles/{{ article.0.pk }}?page={{ index }}">{{ index }}</a>
+                    </li>
+                {% endfor %}
+                {% if pages.has_next %}
+                    <li>
+                        <a href="/{{ article.0.blog.site_name }}/articles/{{ article.0.pk }}?page={{ pages.next_page_number }}"
+                           aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/{{ article.0.blog.site_name }}/articles/{{ article.0.pk }}?page={{ paginator.num_pages }}" aria-label="Previous">
+                            <span aria-hidden="true">尾页</span>
+                        </a>
+                    </li>
+                {% endif %}
+
+            </ul>
+        </nav>
+    {% endif %}
+
+    {% if  request.user.is_authenticated %}
+        <div id="commentform_title">发表评论</div>
+        <p style="margin-top: 10px;line-height: 20px;">
+            昵称：<input type="text" class="author" disabled="disabled" size="50"
+                      value="{{ request.user.username }}">
+        </p>
+        <p>评论内容</p>
+        <textarea name="" cols="50" rows="10" id="comment_content"></textarea>
+        <p><input type="button" class="btn btn-default" value="提交评论" id="comment_btn"><span style="margin-left: 10px;color:red"></span></p>
+    {% else %}
+        <div class="container-fluid">
+            <p>注册用户登录后才能发表评论，请 <a href=""></a>登录 或 注册，访问网站首页。</p>
+        </div>
+
+    {% endif %}
+
+
+
+{% endblock %}
+{% block ajax %}
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+    <script>
+        $('.vote').on('click', function () {
+            if ($(this).hasClass('diggit')) {
+                window.vote = 'like'
+            } else {
+                window.vote = 'against'
+            }
+            $.ajax({
+                url: '/like_and_against/',
+                method: 'post',
+                data: {'article': {{ article.0.pk }}, 'vote': vote, 'csrfmiddlewaretoken': '{{ csrf_token }}'},
+                success: function (data) {
+                    if (data.status == 'success') {
+                        $('#' + data.vote).text(parseInt($('#' + data.vote).text()) + 1);
+                        $('#msg').text('投票成功!')
+                    } else {
+                        $('#msg').text(data.msg)
+                    }
+                }
+            })
+        });
+        $('.reply').on('click', function () {
+            if ($(this).hasClass('recycle')) {
+                $(this).text('回复').removeClass('recycle').parent().parent().next().hide();
+
+            } else {
+                $('.reply.recycle').text('回复').removeClass('recycle').parent().parent().next().hide();
+                $(this).text('收起').addClass('recycle').parent().parent().next().show()
+            }
+
+        });
+        $('.btn_f').on('click', function () {
+            let comment = $(this).parent().prev().children().val();
+            let parent_floor = $(this).parent().parent().prev().prev().attr('floor');
+            let btn = $(this);
+            $.ajax({
+                url: '/comment/reply_floor/',
+                method: 'post',
+                data: {
+                    'comment': comment,
+                    'floor': parent_floor,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                    'article_id':{{ article.0.pk }}
+                },
+                success: function (data) {
+                    if (data.status == 'success') {
+                        let username = '{{ request.user.username }}';
+                        let time = data.time;
+                        let content = data.content;
+                        var ss = `
+                            <li class="list-group-item">
+                            <a href="http://172.96.198.74/${username}">${username}</a>
+                            :${content}
+                                 <div class="container-fluid">
+                                    <p class="pull-right" style="margin-bottom: 0">${time}
+
+                                    </p>
+                                 </div>
+                            </li>
+                        `;
+                        btn.parent().parent().next().children('ul').append(ss)
+                    }
+                }
+            })
+        })
+        $('.reply_to').on('click', function () {
+            $('.reply_to').parent().parent().parent().parent().children('.comment').hide();
+            $(this).parent().parent().parent().parent().children('.comment').show()
+                .children('.col-md-12').children('.content').val('回复 ' + $(this).attr('reply') + ' :')
+        });
+        $('.btn_r').on('click', function () {
+            let content = $(this).parent().prev().children().val();
+            let parent_floor = $(this).parent().parent().parent().parent().prev().prev().prev().attr('floor');
+            let btn = $(this);
+            $.ajax({
+                url: '/comment/reply_user/',
+                method: 'post',
+                data: {
+                    'comment': content,
+                    'floor': parent_floor,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                    'article_id':{{ article.0.pk }},
+                },
+                success: function (data) {
+                    if (data.status == 'success') {
+                        let username = '{{ request.user.username }}';
+                        let time = data.time;
+                        let content = data.content;
+                        let to_user = data.to_user;
+                        var ss = `
+                            <li class="list-group-item">
+                            <a href="http://172.96.198.74/${username}">${username}</a> 回复 ${to_user} :${content}
+                                 <div class="container-fluid">
+                                    <p class="pull-right" style="margin-bottom: 0">${time}
+
+                                    </p>
+                                 </div>
+                            </li>
+                        `;
+                        btn.parent().parent().before(ss);
+                        btn.parent().prev().children('.content').val('')
+                    } else {
+                        console.log(data.msg)
+                    }
+                }
+            })
+
+        })
+        $('#comment_btn').on('click', function () {
+            $.ajax({
+                url: '/comment/root/',
+                method: 'post',
+                data: {
+                    'comment': $('#comment_content').val(),
+                    'floor':{{ article.0.root_floor_count }},
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                    'article_id':{{ article.0.pk }}
+                },
+                success: function (data) {
+                    if (data.status == 'success') {
+                        window.location.reload()
+                    } else {
+                        console.log(data.msg,data)
+                        $('#comment_btn').next().text(data.msg)
+                    }
+                }
+            })
+        });
+        $('.show_all').on('click', function () {
+            $(this).parent().prevAll().removeClass('hidden');
+            $(this).parent().remove();
+        })
+    </script>
+{% endblock %}
+
+
+

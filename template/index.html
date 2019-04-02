@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>博客园-主页</title>
+    <link href="https://cdn.bootcss.com/twitter-bootstrap/3.3.7/css/bootstrap-theme.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <ul class="nav nav-tabs ">
+            <li role="presentation"><a href="http://127.0.0.1:8000">博客园</a></li>
+            <li role="presentation"><a href="">随笔</a></li>
+            <li role="presentation"><a href="">新闻</a></li>
+            <li role="presentation"><a href="">博文</a></li>
+            {% if request.user.is_authenticated %}
+                <li role="presentation" class="pull-right"><a href="/logout/">注销</a></li>
+                <li role="presentation" class="pull-right"><a href="/manager/">管理</a></li>
+                <li role="presentation" class="pull-right"><a
+                        href="/{{ request.user.username }}/">{{ request.user.username }}</a></li>
+            {% else %}
+                <li role="presentation" class="pull-right"><a href="/register/">注册</a></li>
+                <li role="presentation" class="pull-right"><a href="/login/">登陆</a></li>
+            {% endif %}
+        </ul>
+    </div>
+    <div class="row" style="margin-top: 20px;">
+        <div class="col-md-3">
+            <div class="panel panel-default">
+                <div class="panel-heading ">Panel heading without title</div>
+                <div class="panel-body">Panel content</div>
+                <div class="panel-body">Panel content</div>
+                <div class="panel-body">Panel content</div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading"><h3 class="panel-title">Panel title</h3></div>
+                <div class="panel-body">Panel content</div>
+                <div class="panel-body">Panel content</div>
+                <div class="panel-body">Panel content</div>
+            </div>
+        </div>
+        <div class="col-md-6 ">
+            {% for page in pages %}
+                <div class="media">
+                    <div class="media-left">
+                        <a href="/{{ page.blog.userinfo.username }}/">
+                            <img class="media-object" src="media/{{ page.blog.userinfo.avatar }}"
+                                 style="width: 64px;height: 64px" alt="">
+                        </a>
+                    </div>
+                    <div class="media-body">
+                        <h5 class="media-heading"><a
+                                href="/{{ page.blog.userinfo.username }}/articles/{{ page.pk }}">{{ page.title }}</a>
+                        </h5>
+                        <h5 class="media-body">{{ page.content|truncatechars:200 }}</h5>
+                    </div>
+                    <h6>
+                        <a href="/{{ page.blog.userinfo.username }}/">{{ page.blog.userinfo.username }} </a>发表于{{ page.upload_time|date:'Y年m月d日 H:i:s' }}
+                        <span class="glyphicon glyphicon-comment"></span>评论({{ page.comment_count }})
+                        点赞({{ page.like_count }})</h6>
+                </div>
+            {% endfor %}
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    {% if pages.has_previous %}
+                        <li>
+                            <a href="/?page=1" aria-label="Previous">
+                                <span aria-hidden="true">首页</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/?page={{ pages.previous_page_number }}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                    {% for index in range %}
+                        <li {% if pages.number == index %} class="active" {% endif %}><a
+                                href="/?page={{ index }}">{{ index }}</a></li>
+                    {% endfor %}
+                    {% if pages.has_next %}
+                        <li>
+                            <a href="/?page={{ pages.next_page_number }}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/?page={{ paginator.num_pages }}" aria-label="Previous">
+                                <span aria-hidden="true">尾页</span>
+                            </a>
+                        </li>
+                    {% endif %}
+
+                </ul>
+            </nav>
+        </div>
+
+
+        <div class="col-md-3 ">
+            <div class="panel panel-default">
+                <div class="panel-heading">panel-title</div>
+                <div class="panel-body"><a href="">Panel content</a></div>
+                <div class="panel-body"><a href="">Panel content</a></div>
+                <div class="panel-body"><a href="">Panel content</a></div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading"><h3 class="panel-title">panel-title</h3></div>
+                <div class="panel-body"><a href="">Panel content</a></div>
+                <div class="panel-body"><a href="">Panel content</a></div>
+
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
